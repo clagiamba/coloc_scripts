@@ -427,7 +427,7 @@ for(i in 1:length(list.probes)){
                 dataset.eqtl = list(snp = merged.data$SNPID, pvalues = merged.data$PVAL.eqtl,
                            N = merged.data$N.eqtl, type = "quant", MAF=merged.data$MAF.eqtl)
 
-         (coloc.res <- coloc.abf(dataset.biom, dataset.eqtl, p12 = p12))
+         capture.output(coloc.res <- coloc.abf(dataset.biom, dataset.eqtl, p12 = p12))
          pp0       <- as.numeric(coloc.res$summary[2])
          pp1       <- as.numeric(coloc.res$summary[3])
          pp2       <- as.numeric(coloc.res$summary[4])
@@ -453,7 +453,7 @@ for(i in 1:length(list.probes)){
                 dataset.eqtl = list(snp = merged.data$SNPID, beta = merged.data$BETA.eqtl, varbeta= (merged.data$SE.eqtl)^2,
                            N = as.numeric(merged.data$N.eqtl), type = "quant", MAF=merged.data$MAF.eqtl)
 
-         (coloc.res <- coloc.abf(dataset.biom, dataset.eqtl, p12 = p12))
+         capture.output(coloc.res <- coloc.abf(dataset.biom, dataset.eqtl, p12 = p12))
          pp0       <- as.numeric(coloc.res$summary[2])
          pp1       <- as.numeric(coloc.res$summary[3])
          pp2       <- as.numeric(coloc.res$summary[4])
@@ -477,7 +477,7 @@ for(i in 1:length(list.probes)){
          ## COLOC NEW
          # suppressMessages(capture.output(coloc.res <- coloc.abf(dataset.biom, dataset.eqtl, p12 = p12)))
          source("/sc/orga/projects/epigenAD/coloc/coloc2_gitrepo/coloc_scripts/scripts/claudia.R")
-         (coloc.res <- coloc.abf(dataset.biom, dataset.eqtl, p12 = p12, estimate_Neff=FALSE))
+         capture.output(coloc.res <- coloc.abf(dataset.biom, dataset.eqtl, p12 = p12, estimate_Neff=FALSE))
          pp0       <- as.numeric(coloc.res$summary[2])
          pp1       <- as.numeric(coloc.res$summary[3])
          pp2       <- as.numeric(coloc.res$summary[4])
@@ -498,7 +498,7 @@ for(i in 1:length(list.probes)){
          coloc.supplied.var.set.priors = c(pp0, pp1, pp2, pp3, pp4) # this is using the supplied variance and sdY estimates only for quant
 ##     
          #source("/sc/orga/projects/epigenAD/coloc/coloc2_gitrepo/coloc_scripts/scripts/claudia.R")
-         (coloc.res <- coloc.abf(dataset.biom, dataset.eqtl, p12 = p12, estimate_Neff=TRUE))
+         capture.output(coloc.res <- coloc.abf(dataset.biom, dataset.eqtl, p12 = p12, estimate_Neff=TRUE))
          pp0       <- as.numeric(coloc.res$summary[2])
          pp1       <- as.numeric(coloc.res$summary[3])
          pp2       <- as.numeric(coloc.res$summary[4])
@@ -518,6 +518,31 @@ for(i in 1:length(list.probes)){
          coloc.var.Neff.lkl = c(lH0.abf, lH1.abf, lH2.abf, lH3.abf, lH4.abf)
          coloc.var.Neff.set.priors = c(pp0, pp1, pp2, pp3, pp4) # this is using the estimated variance form the effective sample and 
 
+##     
+
+         dataset.biom = list(snp = merged.data$SNPID, beta = merged.data$BETA.biom, varbeta= (merged.data$SE.biom)^2, s=merged.data$s1, type = type, MAF=merged.data$MAF.biom,N=merged.data$N.biom, sdY=1)
+         dataset.eqtl = list(snp = merged.data$SNPID, beta = merged.data$BETA.eqtl, varbeta= (merged.data$SE.eqtl)^2, N = as.numeric(merged.data$N.eqtl), type = "quant", MAF=merged.data$MAF.eqtl, sdY=1)
+
+         capture.output(coloc.res <- coloc.abf(dataset.biom, dataset.eqtl, p12 = p12, estimate_Neff=FALSE))
+         pp0       <- as.numeric(coloc.res$summary[2])
+         pp1       <- as.numeric(coloc.res$summary[3])
+         pp2       <- as.numeric(coloc.res$summary[4])
+         pp3       <- as.numeric(coloc.res$summary[5])
+         pp4       <- as.numeric(coloc.res$summary[6])
+
+         ## Per locus likelihood
+         # Take the logsum of the 4 models
+         l1 = coloc.res$results$lABF.df1
+         l2 = coloc.res$results$lABF.df2
+         lsum <- coloc.res$results$internal.sum.lABF # lsum = l1 + l2
+         lH0.abf <- 0
+         lH1.abf <-  logsum(l1) - log(nsnps)
+         lH2.abf <-  logsum(l2) - log(nsnps)
+         lH3.abf <- logdiff(logsum(l1) + logsum(l2), logsum(lsum))  - log(nsnps^2)
+         lH4.abf <- logsum(lsum) -log(nsnps)
+         coloc.supplied.var.sdY1.lkl = c(lH0.abf, lH1.abf, lH2.abf, lH3.abf, lH4.abf)
+         coloc.supplied.var.sdY1.lkl.set.priors = c(pp0, pp1, pp2, pp3, pp4)
+
 
          snp.biom <- merged.data[which.min(merged.data$PVAL.biom), "SNPID"]
          snp.eqtl <- merged.data[which.min(merged.data$PVAL.eqtl), "SNPID"]
@@ -526,7 +551,7 @@ for(i in 1:length(list.probes)){
          best.causal = as.character(coloc.res$results$snp[which.max(coloc.res$results$SNP.PP.H4)])
          message(unique(merged.data$bed_region))
          #res.temp = data.frame(ProbeID = ProbeID, Chr = chrom, pos.start=pos.start, pos.end=pos.end, nsnps = nsnps, snp.biom=snp.biom, snp.eqtl=snp.eqtl, min.pval.biom=min.pval.biom, min.pval.eqtl=min.pval.eqtl, best.causal=best.causal, PP0.coloc.priors=pp0, PP1.coloc.priors=pp1, PP2.coloc.priors=pp2, PP3.coloc.priors = pp3, PP4.coloc.priors=pp4, lH0.abf=lH0.abf, lH1.abf=lH1.abf, lH2.abf=lH2.abf, lH3.abf=lH3.abf, lH4.abf=lH4.abf, plotFiles=NA, files=NA, bed_region=unique(merged.data$bed_region))
-         res.temp = data.frame(ProbeID = ProbeID, Chr = chrom, pos.start=pos.start, pos.end=pos.end, nsnps = nsnps, snp.biom=snp.biom, snp.eqtl=snp.eqtl, min.pval.biom=min.pval.biom, min.pval.eqtl=min.pval.eqtl, coloc.old.pval.lkl=paste(coloc.old.pval.lkl, collapse=","), coloc.old.var.lkl=paste(coloc.old.var.lkl, collapse=","), coloc.supplied.var.lkl=paste(coloc.supplied.var.lkl, collapse=","), coloc.var.Neff.lkl = paste(coloc.var.Neff.lkl, collapse=","), coloc.old.pval.set.priors = paste(signif(coloc.old.pval.set.priors, digits=3), collapse=","), coloc.old.var.set.priors = paste(signif(coloc.old.var.set.priors, digits=3), collapse=","), coloc.supplied.var.set.priors = paste(signif(coloc.supplied.var.set.priors, digits=3), collapse=","), coloc.var.Neff.set.priors= paste(signif(coloc.var.Neff.set.priors, digits=3), collapse=","), plotFiles=NA, files=NA, bed_region=unique(merged.data$bed_region))
+         res.temp = data.frame(ProbeID = ProbeID, Chr = chrom, pos.start=pos.start, pos.end=pos.end, nsnps = nsnps, snp.biom=snp.biom, snp.eqtl=snp.eqtl, min.pval.biom=min.pval.biom, min.pval.eqtl=min.pval.eqtl, coloc.old.pval.lkl=paste(coloc.old.pval.lkl, collapse=","), coloc.old.var.lkl=paste(coloc.old.var.lkl, collapse=","), coloc.supplied.var.lkl=paste(coloc.supplied.var.lkl, collapse=","), coloc.var.Neff.lkl = paste(coloc.var.Neff.lkl, collapse=","), coloc.supplied.var.sdY1.lkl = paste(coloc.supplied.var.sdY1.lkl, collapse=","), coloc.old.pval.set.priors = paste(signif(coloc.old.pval.set.priors, digits=3), collapse=","), coloc.old.var.set.priors = paste(signif(coloc.old.var.set.priors, digits=3), collapse=","), coloc.supplied.var.set.priors = paste(signif(coloc.supplied.var.set.priors, digits=3), collapse=","), coloc.var.Neff.set.priors= paste(signif(coloc.var.Neff.set.priors, digits=3), collapse=","), coloc.supplied.var.sdY1.lkl.set.priors = paste(signif(coloc.supplied.var.sdY1.lkl.set.priors, digits=3), collapse=","), plotFiles=NA, files=NA, bed_region=unique(merged.data$bed_region))
 
          if (save.coloc.output) {
            coloc.out = paste(outfolder, "/coloc.output.perSNP/", sep="")
@@ -632,17 +657,23 @@ for(i in 1:length(list.probes)){
 }
 
 
-est_lkl <- function(res.all, colnames.lkl = c("lH0.abf", "lH1.abf", "lH2.abf", "lH3.abf", "lH4.abf"), cores=20,bootstrap=F,no_bootstraps=1000) {
+est_lkl <- function(res.all, colnames.lkl = c("lH0.abf", "lH1.abf", "lH2.abf", "lH3.abf", "lH4.abf"), outfolder=NULL, cores=20,bootstrap=F,no_bootstraps=1000) {
    source("/sc/orga/projects/epigenAD/coloc/coloc2_gitrepo/coloc_scripts/scripts/optim_function.R")
    source("/sc/orga/projects/epigenAD/coloc/coloc2_gitrepo/coloc_scripts/scripts/claudia.R")
 
-   optim.res =  paste(outfolder, 'maximization_results.txt', sep='') 
+   if(!is.null(outfolder)) {
+     optim.res =  paste(outfolder, 'maximization_results.txt', sep='') 
+   } else {
+     optim.res =  'maximization_results.txt'
+   }
    # Optimize to find the best parameters
    lkl.frame = res.all[,colnames.lkl]
-   lkl.frame = as.matrix(sapply(lkl.frame, as.numeric))  
+   lkl.frame <-as.matrix(sapply(lkl.frame, function(x) as.numeric(as.character(x))))
+
    alphas = optim(c(2,-2,-2,-2), fn, data=lkl.frame, method = "Nelder-Mead", control=list(fnscale=-1))
    optim.alphas = exp(alphas$par)/ sum(exp(c(alphas$par,alphas$par[2] + alphas$par[3])))
-   write(paste("Model with 4 parameters: ", prefix, ": ", paste(optim.alphas, collapse =" , "), sep=""), file = optim.res, append=TRUE)
+   print(optim.alphas)
+   write(paste("Model with 4 parameters: ", paste(optim.alphas, collapse =" , "), sep=""), file = optim.res, append=FALSE)
        
    alphas = optim(c(2, -2, -2, -2, -2), fn.pw.gwas, data=lkl.frame, method = "Nelder-Mead", control=list(fnscale=-1))
    optim.alphas.mle= exp(alphas$par)/ sum(exp(alphas$par))
@@ -660,7 +691,8 @@ est_lkl <- function(res.all, colnames.lkl = c("lH0.abf", "lH1.abf", "lH2.abf", "
     bootstrap.summary = paste(outfolder, "bootstrap_mle.txt", sep="")
     write.table(ml_estimates,file=bootstrap.summary, quote=F, row.names=F)
  }
-    write(paste("Model with 5 parameters: ", prefix, ": ", paste(optim.alphas.mle, collapse =" , "), sep=""), file = optim.res, append=TRUE)
+   print(optim.alphas.mle)
+   write(paste("Model with 5 parameters: ", paste(optim.alphas.mle, collapse =" , "), sep=""), file = optim.res, append=TRUE)
 
   # compute posteriors using the already computed likelihoods per locus (lH1.abf etc) and the optimized parameters
   # l1 = res.all$lH1.abf[1]; l2 = res.all$lH2.abf[1]; # nsnp = res.all$nsnp[1]

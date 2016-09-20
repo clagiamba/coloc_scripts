@@ -3,6 +3,7 @@ biom.fname=args[1]
 eqtl.fname=args[2]
 outfolder = args[3]
 prefix = args[4]
+chr = args[5]
 
 source("/sc/orga/projects/epigenAD/coloc/coloc2_gitrepo/coloc_scripts/scripts/functions_coloc_pipeline.R")
 source("/sc/orga/projects/epigenAD/coloc/coloc2_gitrepo/coloc_scripts/scripts/functions_coloc_likelihood_summary_integrated.R")
@@ -18,6 +19,10 @@ if (lkl) {
  library(data.table)
  biom.df = data.frame(fread(biom.fname, header=T))
  eqtl.df = data.frame(fread(eqtl.fname, header=T))
+
+ prefix=paste(prefix, chr, sep="_")
+ biom.df = biom.df[biom.df$CHR==chr,]
+ eqtl.df = eqtl.df[eqtl.df$CHR==chr,]
 
  p12=1e-6 # this is for coloc with set priors
  plot = FALSE
@@ -45,7 +50,7 @@ if (optim) {
 # coloc.supplied.var.lkl
 # coloc.var.Neff.lkl
    t= data.frame(res.all, do.call(rbind, out))
-   names(t)[(ncol(t)-4):ncol(t)] = c("lH0.abf", "lH1.abf", "lH2.abf", "lH3.abf", "lH4.abf") 
+   names(t)[(ncol(t)-4):ncol(t)] = c("lH0.abf", "lH1.abf", "lH2.abf", "lH3.abf", "lH4.abf")
    res2 = est_lkl(t, outfolder=outfolder, bootstrap=F, no_bootstraps=1000)
 
    res2 = addGeneNames(res2, biomart=FALSE, geneFileNames = "/sc/orga/projects/psychgen/resources/COLOC2/data/ENSEMBL_v70_TO_HGNC.tsv")
@@ -59,3 +64,4 @@ if (optim) {
  write.table(x =  res2 , file = outfname.new, row.names = FALSE, quote = FALSE, sep = '\t')
 }
 }
+
