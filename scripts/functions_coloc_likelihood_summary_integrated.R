@@ -448,7 +448,8 @@ for(i in 1:length(list.probes)){
          coloc.old.pval.set.priors = c(pp0, pp1, pp2, pp3, pp4)
 
 ##
-                dataset.biom = list(snp = merged.data$SNPID, beta = merged.data$BETA.biom, varbeta= (merged.data$SE.biom)^2,
+#### !!!!! MUST USE THE LOG OF THE OR HERE!!! ?? ALSO IN OUR COLOC2??
+                dataset.biom = list(snp = merged.data$SNPID, beta = log(merged.data$BETA.biom), varbeta= (merged.data$SE.biom)^2,
                            s=merged.data$s1, type = type, MAF=merged.data$MAF.biom,N=merged.data$N.biom) #, sdY=unique(merged.data$sdY.biom))
                 dataset.eqtl = list(snp = merged.data$SNPID, beta = merged.data$BETA.eqtl, varbeta= (merged.data$SE.eqtl)^2,
                            N = as.numeric(merged.data$N.eqtl), type = "quant", MAF=merged.data$MAF.eqtl)
