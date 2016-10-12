@@ -44,6 +44,7 @@ fn.pw.gwas = function(p, data) {
   #print(log(sum(exp(lkl.frame.temp[1,]))))
   sumlkl = sum(apply(lkl.frame.temp, MAR = 1, FUN = logsum))
   #print(sumlkl)
+  sumlkl = sumlkl + c(log(dnorm(a0, mean=2, sd=3), dnorm(p[2:5], mean=-2, sd=3) )
   return(sumlkl)
 }
 
