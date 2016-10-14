@@ -257,4 +257,3 @@ for (chr in commonChr){
 
    return(res.all)
 }
-

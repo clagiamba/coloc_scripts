@@ -67,6 +67,7 @@ odir = "/sc/orga/projects/psychgen/resources/COLOC2/files/GWAS5/"
 for (biom.dataset in c("CARDIoGRAMplusC4D", "CARDIoGRAMplusC4D_REC", "MI", "DAIGRAM", "RA", "ASD", "UC", "CD", "IBD", "SCZ", "BIP", "AD", "PLAQUE", "CIMT", "HDL", "LDL", "TG", "TC", "EXTRAVERSION", "NEUROTICISM", "EduYears", "FEMORAL", "FOREARM", "SPINE", "WellBeing_DS", "WellBeing_Neuroticism", "WellBeing_SWB", "BMI", "HEIGHT", "GIANT_HIP", "GIANT_HIPadjBMI", "GIANT_WC", "GIANT_WCadjBMI", "GIANT_WHR", "GIANT_WHRadjBMI", "MAGIC_Manning_et_al_FastingGlucose_MainEffect", "MAGIC_HbA1C", "MAGIC_Manning_et_al_lnFastingInsulin_MainEffect", "MAGIC_ln_HOMA-B", "MAGIC_ln_HOMA-IR", "URATE")) {
 # LIPID TESL
 
+
  if (biom.dataset == "ASD") { # autism
      biom.fname ="/sc/orga/projects/roussp01a/resources/GWAS/ASD/pgcasdeuro"
      NCASE = 3303
@@ -467,6 +468,13 @@ if (biom.dataset == "CIMT") {
      typeCC=FALSE
  }
 
+#############
+ if (biom.dataset == "BP") {  
+     biom.fname ="/sc/orga/projects/epigenAD/coloc/data/BP/rawData/ICBP-summary-Nature.csv"
+     NCASE = NULL
+     N = 69395
+     typeCC=FALSE
+  }
 
 
 ############################################################

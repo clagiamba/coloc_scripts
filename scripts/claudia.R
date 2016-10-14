@@ -63,6 +63,9 @@ logdiff <- function(x,y) {
   if (x<y) {
     my.res <- my.max + log(exp(y-my.max) - exp(x - my.max ))
   }
+  if (x==y) {
+    my.res=0
+  }
   return(my.res)
 }
 
@@ -367,8 +370,10 @@ process.dataset <- function(d, suffix, ave=TRUE, estimate_Neff=TRUE,correlation=
         return(df)
     }
     # if there are negative value, then it is a logOR?
-    if (length(d$beta[d$beta<0])>0) log=FALSE else log=TRUE
-    if (d$type=="cc" & log) d$z = log(d$beta)/sqrt(d$varbeta) else d$z = d$beta/sqrt(d$varbeta)
+    if (length(d$beta[d$beta<0])>0) log=FALSE else log=TRUE  # make sure beta is already logged for CC!
+    if (log) warning("Make sure beta is already logged for CC")
+    #if (d$type=="cc" & log) d$z = log(d$beta)/sqrt(d$varbeta) else d$z = d$beta/sqrt(d$varbeta)
+    d$z = d$beta/sqrt(d$varbeta)
     #if (d$type == "quant") {
         if(!ave) {
       df <- approx.bf.estimates(z=d$z,
