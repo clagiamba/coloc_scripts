@@ -258,29 +258,6 @@ combine.abf.locus <- function(l0, l1, l2, l3, l4, a0, a1, a2, a3, a4) {
   return(pp.abf)
 }
 
-fn.pw.gwas = function(p, data) {
-  a0 = p[1]
-  a1 = p[2]
-  a2 = p[3]
-  a3 = p[4]
-  a4 = p[5]
-  #print(nrow(data))
-  suma = sum(exp(c(a0,a1,a2,a3,a4)))
-  #print(paste("Alphas:" , exp(a0)/suma,exp(a1)/suma,exp(a2)/suma,exp(a3)/suma,exp(a4)/suma), sep=" ")
-  lkl.frame.temp <- as.matrix(data)
-  lkl.frame.temp[,1] <- log(exp(a0)/suma)
-  lkl.frame.temp[,2] <- lkl.frame.temp[,2] + log(exp(a1)/suma)
-  lkl.frame.temp[,3] <- lkl.frame.temp[,3] + log(exp(a2)/suma)
-  lkl.frame.temp[,4] <- lkl.frame.temp[,4] + log(exp(a3)/suma)
-  lkl.frame.temp[,5] <- lkl.frame.temp[,5] + log(exp(a4)/suma)
-  #print(lkl.frame.temp[1,])
-  #print(apply(lkl.frame.temp, MAR = 1, FUN = logsum))
-  #print(log(sum(exp(lkl.frame.temp[1,]))))
-  sumlkl = sum(apply(lkl.frame.temp, MAR = 1, FUN = logsum))
-  #print(sumlkl)
-  return(sumlkl)
-}
-
 ##' Estimate trait standard deviation given vectors of variance of coefficients,  MAF and sample size
 ##'
 ##' Estimate is based on var(beta-hat) = var(Y) / (n * var(X))
